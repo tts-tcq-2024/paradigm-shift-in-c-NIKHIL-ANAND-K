@@ -1,46 +1,40 @@
 #include <stdio.h>
 #include <assert.h>
- 
-#define OUTOFBOUNDARY 0
-#define WITHINRANGE 1
- 
-/*Function to check whether the battery paramter is within the range*/
-int checkRange(float data, float min, float max, const char* nameOfBatteryParameter)
-{
-int output = WITHINRANGE;
-if (data > max || data < min)
-{
-  output = OUTOFBOUNDARY;
-  logger(nameOfBatteryParameter);
+
+/* Function prototypes */
+void logger(const char* stringToBePrinted);
+
+/* Function to check whether the battery parameter is within the range */
+int checkRange(float data, float min, float max, const char* nameOfBatteryParameter) {
+    if (data > max || data < min) {
+        logger(nameOfBatteryParameter);
+        return 0; // OUTOFBOUNDARY
+    }
+    return 1; // WITHINRANGE
 }
-return output;
+
+/* Function to print the error logs */
+void logger(const char* stringToBePrinted) {
+    printf("%s out of range!\n", stringToBePrinted);
 }
- 
-/*Function to print the error logs*/
-void logger(const char* stringToBePrinted)
-{
-printf("%s out of range!\n",stringToBePrinted);
+
+/* Function to check if battery parameters are within acceptable ranges */
+int batteryIsOk(float temperature, float soc, float chargeRate) {
+    if (!checkRange(temperature, 0, 45, "Temperature")) {
+        return 0;
+    }
+    
+    if (!checkRange(soc, 20, 80, "State of Charge")) {
+        return 0;
+    }
+    
+    return checkRange(chargeRate, 0, 0.8, "Charge Rate");
 }
- 
-int batteryIsOk(float temperature, float soc, float chargeRate) 
-{
-int functionResult = 1; 
-if(checkRange(temperature,0,45,"Temperature") == OUTOFBOUNDARY)
-{
-  functionResult = 0;
-}
-else if(checkRange(soc,20,80,"State of Charge") == OUTOFBOUNDARY)
-{
-  functionResult = 0;
-}
-else
-{
-  functionResult = checkRange(chargeRate,0,0.8,"Charge Rate");
-}
-  return functionResult;
-}
- 
+
+/* Main function */
 int main() {
-  assert(batteryIsOk(25, 70, 0.7));
-  assert(!batteryIsOk(50, 85, 0));
+    assert(batteryIsOk(25, 70, 0.7));
+    assert(!batteryIsOk(50, 85, 0));
+    
+    return 0;
 }
